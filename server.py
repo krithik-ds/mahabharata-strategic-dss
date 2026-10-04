@@ -11,7 +11,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+import torch
 from sentence_transformers import SentenceTransformer
+
+# Limit CPU threads to prevent memory spikes on free cloud instances
+torch.set_num_threads(1)
 
 # Directory paths and config constants
 MODELS_DIR = "models_v8"
@@ -290,12 +294,17 @@ async def get_dataset_stats():
     }
 
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "service": "Mahabharata Strategic DSS"}
+
+
 # Static web UI files
 os.makedirs("static", exist_ok=True)
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
-    # Support dynamic PORT environment variable (useful for cloud/Docker hosting)
-    port = int(os.environ.get("PORT", 7860))
+    # Support dynamic PORT environment variable (Render sets PORT=10000)
+    port = int(os.environ.get("PORT", 10000))
     uvicorn.run(app, host="0.0.0.0", port=port)

@@ -2,19 +2,16 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+ENV PYTHONUNBUFFERED=1
+ENV PORT=10000
 
-# Install python dependencies
+# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
 COPY . .
 
-# Expose port (default 7860 / dynamic Render PORT)
-EXPOSE 7860
+EXPOSE 10000
 
 CMD ["python", "server.py"]
