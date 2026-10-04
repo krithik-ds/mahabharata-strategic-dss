@@ -11,11 +11,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-import torch
-from sentence_transformers import SentenceTransformer
-
-# Limit CPU threads to prevent memory spikes on free cloud instances
-torch.set_num_threads(1)
 
 # Directory paths and config constants
 MODELS_DIR = "models_v8"
@@ -83,8 +78,19 @@ field_embeddings = joblib.load(os.path.join(MODELS_DIR, "field_embeddings_v8.job
 active_weights = joblib.load(os.path.join(MODELS_DIR, "weights_v8.joblib"))
 model_name = joblib.load(os.path.join(MODELS_DIR, "model_name.joblib"))
 
-print(f"Loading transformer model ({model_name})...")
-model = SentenceTransformer(model_name)
+try:
+    from fastembed import TextEmbedding
+    USE_FASTEMBED = True
+    print("Loading lightweight FastEmbed ONNX engine (Memory ~35MB)...")
+    model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
+except Exception:
+    import torch
+    from sentence_transformers import SentenceTransformer
+    torch.set_num_threads(1)
+    USE_FASTEMBED = False
+    print(f"Loading transformer model ({model_name})...")
+    model = SentenceTransformer(model_name)
+
 print(f"Ready! Total cases indexed: {len(cases_df)}")
 
 
@@ -194,7 +200,10 @@ def find_matching_cases(user_query, top_k=3):
         raise ValueError("Query string cannot be empty.")
 
     # Encode user query
-    encoded_query = model.encode([cleaned_query], normalize_embeddings=True, show_progress_bar=False)[0]
+    if USE_FASTEMBED:
+        encoded_query = np.array(list(model.embed([cleaned_query]))[0], dtype=np.float32)
+    else:
+        encoded_query = model.encode([cleaned_query], normalize_embeddings=True, show_progress_bar=False)[0]
     query_vector = encoded_query.astype(np.float32)
 
     # Compute dot product similarity across all views

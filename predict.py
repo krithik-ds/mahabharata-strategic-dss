@@ -22,9 +22,19 @@ field_embeddings = joblib.load(os.path.join(MODELS_DIR, "field_embeddings_v8.job
 weights = joblib.load(os.path.join(MODELS_DIR, "weights_v8.joblib"))
 model_name = joblib.load(os.path.join(MODELS_DIR, "model_name.joblib"))
 
-print(f"Loaded {len(cases_df)} historical Mahabharata case studies.")
-print(f"Loading SentenceTransformer: {model_name}...")
-model = SentenceTransformer(model_name)
+try:
+    from fastembed import TextEmbedding
+    USE_FASTEMBED = True
+    print("Loading lightweight FastEmbed ONNX engine (Memory ~35MB)...")
+    model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
+except Exception:
+    import torch
+    from sentence_transformers import SentenceTransformer
+    torch.set_num_threads(1)
+    USE_FASTEMBED = False
+    print(f"Loading SentenceTransformer: {model_name}...")
+    model = SentenceTransformer(model_name)
+
 print("DSS Engine Ready!\n")
 
 
@@ -64,7 +74,10 @@ def predict(query_text, top_k=DEFAULT_TOP_K):
         raise ValueError("Please provide a valid non-empty query.")
 
     # Generate query embedding
-    encoded = model.encode([cleaned_query], normalize_embeddings=True, show_progress_bar=False)[0]
+    if USE_FASTEMBED:
+        encoded = np.array(list(model.embed([cleaned_query]))[0], dtype=np.float32)
+    else:
+        encoded = model.encode([cleaned_query], normalize_embeddings=True, show_progress_bar=False)[0]
     query_vector = encoded.astype(np.float32)
 
     # Calculate similarity across each strategic field
