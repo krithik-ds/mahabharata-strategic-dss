@@ -1,0 +1,16 @@
+test_id,query,expected_case_id,expected_category
+1,Our student team has two members strongly disagreeing about how to divide a limited project budget. We need a negotiated solution without damaging the relationship.,10,Negotiation / conflict resolution
+2,A project has a fixed deadline and a critical dependency has suddenly failed. We need an alternative plan to finish on time.,16,Time constraint / adaptive strategy
+3,A leader must choose between a personally beneficial option and an option that better serves the wider group.,13,Ethical decision-making / leadership
+4,Two organisations have conflicting interests but both could benefit from forming a temporary alliance.,2,Alliance / cooperation
+5,A team receives incomplete information about a competitor and must decide whether to act now or wait for more evidence.,15,Uncertainty / risk
+6,A manager needs to persuade an opposing stakeholder to accept a peaceful compromise before a disagreement escalates.,10,Diplomacy / negotiation
+7,A group is facing a serious crisis and its leader must coordinate people quickly while maintaining morale.,8,Crisis leadership
+8,An organisation discovers that a previous decision created a major vulnerability and must adapt its strategy before the situation worsens.,18,Strategic adaptation / vulnerability
+9,A team has lost an important source of knowledge and needs a process for preserving and reinforcing what it has learned.,25,Knowledge management / learning
+10,A senior leader is preparing to hand responsibilities to a successor and wants to avoid disruption during the transition.,23,Succession / governance
+11,A negotiation has failed repeatedly and the parties must decide whether further diplomacy is worthwhile or whether escalation is unavoidable.,10,Negotiation / escalation
+12,A team member is under pressure and may make a risky decision because of overconfidence and poor judgement.,4,Risk / cognitive bias
+13,An organisation needs to recover from a major operational failure and continue functioning with limited resources.,26,Disaster recovery / continuity
+14,A group needs to achieve an important objective despite having fewer resources than its opponent.,3,Asymmetric strategy / resource constraints
+15,A leader must communicate a difficult change to a team that is resistant and uncertain about the future.,13,Change management / communication
